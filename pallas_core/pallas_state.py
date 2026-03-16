@@ -19,15 +19,16 @@ class PallasState:
         conn.execute(
             "CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, metadata TEXT, created_at REAL)"
         )
+        # Drop and recreate to handle schema changes during development
+        try:
+            # Check if created_at exists, if not, table is older schema
+            conn.execute("SELECT created_at FROM messages LIMIT 1")
+        except sqlite3.OperationalError:
+            conn.execute("DROP TABLE IF EXISTS messages")
+            
         conn.execute(
             "CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, role TEXT, content TEXT, tokens INTEGER, created_at REAL)"
         )
-        # Migration: Ensure tokens column exists
-        try:
-            conn.execute("ALTER TABLE messages ADD COLUMN tokens INTEGER DEFAULT 0")
-        except sqlite3.OperationalError:
-            pass  # Already exists
-            
         conn.commit()
         conn.close()
 

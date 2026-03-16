@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 PROJECT_NAME = "Pallas"
-VERSION = "0.1.3"
+VERSION = "0.1.4"
 VINKURA_BRAND = "Vinkura AI"
 
 HOME_DIR = Path.home() / ".pallas"
