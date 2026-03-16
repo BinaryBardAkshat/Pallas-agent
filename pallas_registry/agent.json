@@ -1,0 +1,14 @@
+{
+    "id": "pallas-agent",
+    "name": "Pallas",
+    "version": "0.1.0",
+    "description": "Self-Evolving AI Agent OS",
+    "author": "VinkuraAI",
+    "capabilities": [
+        "file_management",
+        "terminal_access",
+        "web_browsing",
+        "skill_creation",
+        "messaging_gateway"
+    ]
+}
