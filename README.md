@@ -7,7 +7,7 @@
 
 ---
 
-## 🌌 Why Pallas?
+## Why Pallas?
 
 Mainstream chatbots sit behind restrictive firewalls, throttling your engineering potential. You repeatedly paste code, lose context, hit rigid token limits, and start over. 
 
@@ -16,7 +16,20 @@ Pallas acts as your highly localized, autonomous co-pilot built entirely on a **
 
 It completely persists your identity and project history via a hyper-fast embedded SQL engine with Full-Text Search, recalling design decisions and past architectures across coding sessions. It's your personal Jarvis for elite engineering.
 
-## 🧠 The 5-Brain Architecture
+## 1-Click Global Installation
+
+You can install Pallas globally onto your system using our install script. Simply run this command in your terminal from the root of the project:
+
+```bash
+bash install.sh
+```
+
+Once installed globally, you can initialize the agent from any directory by typing:
+```bash
+pallas start
+```
+
+## The 5-Brain Architecture
 
 Our state-of-the-art multi-agent framework guarantees modular robustness:
 
@@ -26,7 +39,7 @@ Our state-of-the-art multi-agent framework guarantees modular robustness:
 4. **Learning Memory**: `memories_fts`. An SQLite-backed hybrid store archiving every conversational turn to ensure massive context pruning logic.
 5. **Execution Scheduler**: Deep background routines allowing self-hosted cron events to trim logs and compress summaries.
 
-## 🚀 Setting Up
+## Manual Setup
 
 Pallas incorporates a stunning terminal-based interactive UI to make onboarding beautiful and entirely seamless.
 
@@ -48,7 +61,7 @@ uv run pallas start
 3. **Automated Key Injection:** If it's your absolute first time opening the agent, Pallas detects the missing secrets and securely prompts you for your API key. It quietly auto-generates your `.env` file behind the scenes.
 4. **Terminal Interface:** The iconic Vinkura banner drops, system diagnostics go online, and Pallas awaits your directive!
 
-## 💻 CLI Usage
+## CLI Usage
 
 Pallas utilizes the massive `click` engine. You can discover its capabilities rapidly:
 
@@ -61,5 +74,5 @@ Pallas utilizes the massive `click` engine. You can discover its capabilities ra
 ### Pro-Tip Flag
 Power users only: Pass the `--no-approval` flag to run the agent completely autonomously. This bypasses the default `[Y/n]` human-in-the-loop firewalls for bash commands and unspools its true speed:
 ```bash
-uv run pallas start --provider anthropic --no-approval
+pallas start --provider anthropic --no-approval
 ```

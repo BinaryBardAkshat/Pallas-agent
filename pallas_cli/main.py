@@ -9,7 +9,11 @@ from pallas_cli.banner import display_banner
 from pallas_cli.commands import chat_session, show_config
 from pallas_cli.doctor import run_doctor as _run_doctor
 
-load_dotenv()
+# Attempt to load local project .env first, fallback to global user .env
+load_dotenv(dotenv_path=os.path.join(os.getcwd(), ".env"))
+if not os.getenv("ANTHROPIC_API_KEY") and not os.getenv("GOOGLE_API_KEY"):
+    load_dotenv(dotenv_path=os.path.expanduser("~/.pallas/.env"))
+
 console = Console()
 
 

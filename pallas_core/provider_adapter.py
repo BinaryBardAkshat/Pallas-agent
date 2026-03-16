@@ -183,7 +183,7 @@ class ProviderAdapter:
         ).to_dict()
 
     def _google_completion(
-        self, messages, system, model, max_tokens
+        self, messages, system, model, max_tokens, tools=None
     ) -> Dict[str, Any]:
         client = self._clients.get(PROVIDER_GOOGLE)
         if not client:
@@ -192,26 +192,82 @@ class ProviderAdapter:
                 error="no_key",
             ).to_dict()
 
-        last_user_content = ""
-        for m in reversed(messages):
-            if m["role"] == "user":
-                last_user_content = m["content"]
-                break
+        from google import genai
+        from google.genai import types
+        
+        gemini_tools = []
+        if tools:
+            for t in tools:
+                props = {}
+                required = t.get("input_schema", {}).get("required", [])
+                for prop_name, prop_data in t.get("input_schema", {}).get("properties", {}).items():
+                    props[prop_name] = types.Schema(
+                        type=types.Type.STRING,
+                        description=prop_data.get("description", ""),
+                    )
+                
+                gemini_tools.append(
+                    types.Tool(
+                        function_declarations=[
+                            types.FunctionDeclaration(
+                                name=t["name"],
+                                description=t["description"],
+                                parameters=types.Schema(
+                                    type=types.Type.OBJECT,
+                                    properties=props,
+                                    required=required,
+                                )
+                            )
+                        ]
+                    )
+                )
 
-        full_prompt = f"{system}\n\n{last_user_content}" if system else last_user_content
-
+        gemini_messages = []
+        for m in messages:
+            role = "user" if m["role"] == "user" else "model"
+            text_content = m.get("content", "")
+            if not text_content:
+                text_content = " "
+            gemini_messages.append(
+                types.Content(role=role, parts=[types.Part.from_text(text=text_content)])
+            )
+                
         try:
+            config_kwargs = {}
+            if gemini_tools:
+                config_kwargs["tools"] = gemini_tools
+            if system:
+                config_kwargs["system_instruction"] = system
+                
             resp = client.models.generate_content(
                 model=model,
-                contents=full_prompt,
+                contents=gemini_messages,
+                config=types.GenerateContentConfig(**config_kwargs) if config_kwargs else None
             )
+
+            tool_calls = []
+            content = ""
+            
+            if resp.candidates and resp.candidates[0].content and resp.candidates[0].content.parts:
+                for part in resp.candidates[0].content.parts:
+                    if part.function_call:
+                        args_dict = {k: v for k, v in part.function_call.args.items()} if part.function_call.args else {}
+                        tool_calls.append({
+                            "name": part.function_call.name,
+                            "input": args_dict,
+                            "id": "gemini_call"
+                        })
+                    elif part.text:
+                        content += part.text
+
             return ProviderResponse(
-                content=resp.text,
+                content=content,
+                tool_calls=tool_calls,
                 tokens=0,
                 stop_reason="end_turn",
             ).to_dict()
         except Exception as e:
-            return ProviderResponse(content="", error=str(e)).to_dict()
+            return ProviderResponse(content="", error=f"Gemini API Error: {str(e)}").to_dict()
 
     def _openai_completion(
         self, messages, system, model, max_tokens
