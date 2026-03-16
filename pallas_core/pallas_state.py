@@ -1,7 +1,7 @@
 import json
 import sqlite3
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from .pallas_constants import CONFIG_PATH, SESSIONS_DB_PATH, MEMORY_DB_PATH
 from .pallas_time import timestamp
 
@@ -18,6 +18,9 @@ class PallasState:
         conn = sqlite3.connect(self.db_path)
         conn.execute(
             "CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, metadata TEXT, created_at REAL)"
+        )
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, role TEXT, content TEXT, tokens INTEGER, created_at REAL)"
         )
         conn.commit()
         conn.close()
@@ -62,3 +65,21 @@ class PallasState:
         )
         conn.commit()
         conn.close()
+
+    def save_message(self, session_id: str, role: str, content: str, tokens: int = 0):
+        conn = sqlite3.connect(self.db_path)
+        conn.execute(
+            "INSERT INTO messages (session_id, role, content, tokens, created_at) VALUES (?, ?, ?, ?, ?)",
+            (session_id, role, content, tokens, timestamp()),
+        )
+        conn.commit()
+        conn.close()
+
+    def get_messages(self, session_id: str) -> List[Dict[str, Any]]:
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM messages WHERE session_id = ? ORDER BY created_at ASC", (session_id,))
+        rows = cur.fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
