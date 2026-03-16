@@ -15,8 +15,8 @@ from pallas_core.display import (
     print_thinking,
     print_memories,
 )
-from pallas_constants import DEFAULT_MODELS, PROVIDER_ANTHROPIC
-from pallas_state import PallasState
+from pallas_core.pallas_constants import PROVIDER_ANTHROPIC, DEFAULT_MODELS
+from pallas_core.pallas_state import PallasState
 from tools.approval import ApprovalGate
 
 
@@ -48,32 +48,51 @@ class AgentLoop:
         self._tool_registry[name] = fn
 
     def _get_tool_schemas(self) -> List[Dict]:
-        return [
-            {
-                "name": "terminal",
-                "description": "Execute bash commands in the local system. You have full access. Use this to take over the terminal and get whatever you need (ls, cat, grep, python, git, etc).",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "command": {"type": "string", "description": "The exact bash command to execute."}
-                    },
-                    "required": ["command"]
-                }
-            },
-            {
-                "name": "file",
-                "description": "Read, write, append, or list files.",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "action": {"type": "string", "enum": ["read", "write", "append", "list"]},
-                        "path": {"type": "string", "description": "Absolute or relative path"},
-                        "content": {"type": "string", "description": "Content to write/append (optional)"}
-                    },
-                    "required": ["action", "path"]
-                }
-            }
-        ]
+        schemas = []
+        for name, fn in self._tool_registry.items():
+            if hasattr(fn, "schema"):
+                schemas.append(fn.schema)
+            else:
+                # Fallback schemas for core tools if they don't have a .schema property
+                if name == "terminal":
+                    schemas.append({
+                        "name": "terminal",
+                        "description": "Execute bash commands in the local system. You have full access. Use this to take over the terminal and get whatever you need (ls, cat, grep, python, git, etc).",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {
+                                "command": {"type": "string", "description": "The exact bash command to execute."}
+                            },
+                            "required": ["command"]
+                        }
+                    })
+                elif name == "file":
+                    schemas.append({
+                        "name": "file",
+                        "description": "Read, write, append, or list files.",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {
+                                "action": {"type": "string", "enum": ["read", "write", "append", "list"]},
+                                "path": {"type": "string", "description": "Absolute or relative path"},
+                                "content": {"type": "string", "description": "Content to write/append (optional)"}
+                            },
+                            "required": ["action", "path"]
+                        }
+                    })
+                elif name == "web":
+                    schemas.append({
+                        "name": "web",
+                        "description": "Search the web or fetch URL content.",
+                        "input_schema": {
+                            "type": "object",
+                            "properties": {
+                                "query": {"type": "string", "description": "Search query or URL"}
+                            },
+                            "required": ["query"]
+                        }
+                    })
+        return schemas
 
     def run(self, user_input: str) -> str:
         import time

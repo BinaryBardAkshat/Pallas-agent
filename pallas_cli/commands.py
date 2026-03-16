@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from environments.agent_loop import AgentLoop
 from tools import FileTool, TerminalTool, WebTool, MemoryTool, CodeExecutionTool, SkillManagerTool
-from pallas_constants import PROVIDER_ANTHROPIC, DEFAULT_MODELS
+from pallas_core.pallas_constants import PROVIDER_ANTHROPIC, DEFAULT_MODELS
 
 
 def chat_session(

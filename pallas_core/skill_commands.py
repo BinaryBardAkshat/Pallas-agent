@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List, Optional
-from pallas_constants import SKILLS_DIR
+from .pallas_constants import SKILLS_DIR
 
 
 class SkillCommands:

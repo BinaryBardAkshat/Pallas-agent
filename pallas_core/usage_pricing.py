@@ -7,7 +7,7 @@ class UsagePricing:
 
     def record(self, model: str, input_tokens: int, output_tokens: int):
         from pallas_core.model_metadata import get_model_info
-        from pallas_time import timestamp
+        from .pallas_time import timestamp
 
         info = get_model_info(model)
         cost = 0.0

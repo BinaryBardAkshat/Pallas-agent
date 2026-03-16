@@ -3,7 +3,14 @@ import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from pallas_constants import MEMORY_DB_PATH
+from .pallas_constants import (
+    MEMORY_DB_PATH,
+    PROVIDER_ANTHROPIC,
+    PROVIDER_GOOGLE,
+    PROVIDER_OPENAI,
+    PROVIDER_OPENROUTER,
+    PROVIDER_OLLAMA,
+)
 
 
 class MemoryStore:
@@ -43,7 +50,7 @@ class MemoryStore:
         importance: int = 1,
         source: str = "agent",
     ) -> int:
-        from pallas_time import timestamp
+        from .pallas_time import timestamp
         tags_json = json.dumps(tags or [])
         cur = self.db.execute(
             "INSERT INTO memories (session_id, content, tags, importance, created_at, source) VALUES (?,?,?,?,?,?)",
@@ -81,7 +88,7 @@ class MemoryStore:
         return [dict(r) for r in rows]
 
     def set_soul_key(self, key: str, value: str):
-        from pallas_time import timestamp
+        from .pallas_time import timestamp
         self.db.execute(
             "INSERT OR REPLACE INTO soul (key, value, updated_at) VALUES (?,?,?)",
             (key, value, timestamp())

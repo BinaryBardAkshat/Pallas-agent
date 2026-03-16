@@ -2,7 +2,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 from pallas_core.provider_adapter import ProviderAdapter
-from pallas_constants import DEFAULT_MODELS, PROVIDER_ANTHROPIC, PROVIDER_GOOGLE
+from .pallas_constants import DEFAULT_MODELS, PROVIDER_ANTHROPIC, PROVIDER_GOOGLE
 
 
 class AuxiliaryClient:

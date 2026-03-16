@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional
 
-from pallas_constants import DEFAULT_MODELS, PROVIDER_ANTHROPIC
+from .pallas_constants import DEFAULT_MODELS, PROVIDER_ANTHROPIC
 
 
 class ContextCompressor:

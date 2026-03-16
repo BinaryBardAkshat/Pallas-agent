@@ -1,7 +1,8 @@
 import os
+import uuid
 from typing import Any, Dict, List, Optional
 
-from pallas_constants import (
+from .pallas_constants import (
     DEFAULT_MODELS,
     PROVIDER_ANTHROPIC,
     PROVIDER_GOOGLE,
@@ -192,17 +193,27 @@ class ProviderAdapter:
                 error="no_key",
             ).to_dict()
 
-        from google import genai
         from google.genai import types
         
         gemini_tools = []
         if tools:
             for t in tools:
                 props = {}
-                required = t.get("input_schema", {}).get("required", [])
-                for prop_name, prop_data in t.get("input_schema", {}).get("properties", {}).items():
+                input_schema = t.get("input_schema", {})
+                required = input_schema.get("required", [])
+                
+                for prop_name, prop_data in input_schema.get("properties", {}).items():
+                    p_type = prop_data.get("type", "string").upper()
+                    # Map to types.Type
+                    gen_type = types.Type.STRING
+                    if p_type == "NUMBER": gen_type = types.Type.NUMBER
+                    elif p_type == "INTEGER": gen_type = types.Type.INTEGER
+                    elif p_type == "BOOLEAN": gen_type = types.Type.BOOLEAN
+                    elif p_type == "ARRAY": gen_type = types.Type.ARRAY
+                    elif p_type == "OBJECT": gen_type = types.Type.OBJECT
+                    
                     props[prop_name] = types.Schema(
-                        type=types.Type.STRING,
+                        type=gen_type,
                         description=prop_data.get("description", ""),
                     )
                 
@@ -225,15 +236,40 @@ class ProviderAdapter:
         gemini_messages = []
         for m in messages:
             role = "user" if m["role"] == "user" else "model"
-            text_content = m.get("content", "")
-            if not text_content:
-                text_content = " "
-            gemini_messages.append(
-                types.Content(role=role, parts=[types.Part.from_text(text=text_content)])
-            )
+            content_parts = []
+            
+            # 1. Text content
+            if isinstance(m.get("content"), str) and m["content"].strip():
+                # Check if this user message is actually a tool result block from AgentLoop
+                if m["role"] == "user" and m["content"].startswith("Tool results:\n"):
+                    # This is effectively a collection of function responses.
+                    # In a more perfect implementation, we'd match individual tool results to their calls.
+                    # For now, we'll keep it as text to avoid complex state tracking,
+                    # but ensure the tool calls themselves are represented in the history.
+                    content_parts.append(types.Part.from_text(text=m["content"]))
+                else:
+                    content_parts.append(types.Part.from_text(text=m["content"]))
+            
+            # 2. Tool calls (FunctionCall) if it's an assistant message
+            if m["role"] == "assistant" and m.get("tool_calls"):
+                for tc in m["tool_calls"]:
+                    # Gemini needs individual FunctionCall parts
+                    content_parts.append(types.Part.from_function_call(
+                        name=tc["name"],
+                        args=tc["input"],
+                    ))
+            
+            # 3. Tool results (FunctionResponse)
+            # If the AgentLoop passes results as structured data in the future, we handle it here.
+            # Currently it's injected as a user text block above.
+
+            if content_parts:
+                gemini_messages.append(types.Content(role=role, parts=content_parts))
                 
         try:
-            config_kwargs = {}
+            config_kwargs = {
+                "max_output_tokens": max_tokens,
+            }
             if gemini_tools:
                 config_kwargs["tools"] = gemini_tools
             if system:
@@ -242,11 +278,12 @@ class ProviderAdapter:
             resp = client.models.generate_content(
                 model=model,
                 contents=gemini_messages,
-                config=types.GenerateContentConfig(**config_kwargs) if config_kwargs else None
+                config=types.GenerateContentConfig(**config_kwargs)
             )
 
             tool_calls = []
             content = ""
+            stop_reason = "end_turn"
             
             if resp.candidates and resp.candidates[0].content and resp.candidates[0].content.parts:
                 for part in resp.candidates[0].content.parts:
@@ -255,8 +292,9 @@ class ProviderAdapter:
                         tool_calls.append({
                             "name": part.function_call.name,
                             "input": args_dict,
-                            "id": "gemini_call"
+                            "id": f"call_{uuid.uuid4().hex[:8]}"
                         })
+                        stop_reason = "tool_use"
                     elif part.text:
                         content += part.text
 
@@ -264,13 +302,13 @@ class ProviderAdapter:
                 content=content,
                 tool_calls=tool_calls,
                 tokens=0,
-                stop_reason="end_turn",
+                stop_reason=stop_reason,
             ).to_dict()
         except Exception as e:
             return ProviderResponse(content="", error=f"Gemini API Error: {str(e)}").to_dict()
 
     def _openai_completion(
-        self, messages, system, model, max_tokens
+        self, messages, system, model, max_tokens, tools=None
     ) -> Dict[str, Any]:
         client = self._clients.get(PROVIDER_OPENAI)
         if not client:
@@ -279,11 +317,14 @@ class ProviderAdapter:
                 error="no_key",
             ).to_dict()
 
-        combined_input = ""
+        input_lines: List[str] = []
         if system:
-            combined_input += f"[System]\n{system}\n\n"
+            input_lines.append(f"[System]\n{system}\n\n")
         for m in messages:
-            combined_input += f"[{m['role']}]\n{m['content']}\n\n"
+            content = m.get("content", "")
+            input_lines.append(f"[{m['role']}]\n{content}\n\n")
+        
+        combined_input = "".join(input_lines)
 
         try:
             resp = client.responses.create(
@@ -314,15 +355,19 @@ class ProviderAdapter:
                 error="no_key",
             ).to_dict()
 
-        all_messages = []
+        input_lines: List[str] = []
         if system:
-            all_messages.append({"role": "system", "content": system})
-        all_messages.extend(messages)
+            input_lines.append(f"[System]\n{system}\n\n")
+        for m in messages:
+            content = m.get("content", "")
+            input_lines.append(f"[{m['role']}]\n{content}\n\n")
+        
+        combined_input = "".join(input_lines)
 
         try:
             resp = client.chat.completions.create(
                 model=model,
-                messages=all_messages,
+                messages=[{"role": "user", "content": combined_input}],
                 max_tokens=max_tokens,
             )
             return ProviderResponse(
@@ -351,7 +396,7 @@ class ProviderAdapter:
         try:
             resp = client.chat.completions.create(
                 model=model,
-                messages=all_messages,
+                messages=[{"role": "user", "content": combined_input}],
                 max_tokens=max_tokens,
             )
             return ProviderResponse(

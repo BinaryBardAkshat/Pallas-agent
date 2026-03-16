@@ -1,6 +1,14 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
-from pallas_time import timestamp
+from .pallas_time import timestamp
+from .pallas_constants import (
+    DEFAULT_MODELS,
+    PROVIDER_ANTHROPIC,
+    PROVIDER_GOOGLE,
+    PROVIDER_OPENAI,
+    PROVIDER_OPENROUTER,
+    PROVIDER_OLLAMA,
+)
 
 
 @dataclass
@@ -40,12 +48,17 @@ class Trajectory:
         self.steps.append(step)
         return step
 
-    def to_messages(self) -> List[Dict[str, str]]:
-        return [
-            {"role": s.role, "content": s.content}
-            for s in self.steps
-            if s.role in ("user", "assistant")
-        ]
+    def to_messages(self) -> List[Dict[str, Any]]:
+        messages = []
+        for s in self.steps:
+            msg = {"role": s.role, "content": s.content}
+            if s.tool_calls:
+                msg["tool_calls"] = [
+                    {"name": tc.name, "input": tc.input, "output": tc.output, "error": tc.error}
+                    for tc in s.tool_calls
+                ]
+            messages.append(msg)
+        return messages
 
     def total_tokens(self) -> int:
         return sum(s.tokens for s in self.steps)

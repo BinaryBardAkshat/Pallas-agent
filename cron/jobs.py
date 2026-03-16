@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from environments.agent_loop import AgentLoop
-from pallas_constants import PROVIDER_ANTHROPIC
+from pallas_core.pallas_constants import PROVIDER_ANTHROPIC
 
 
 def daily_summary_job(agent: AgentLoop = None) -> str:

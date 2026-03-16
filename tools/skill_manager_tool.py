@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from pallas_constants import SKILLS_DIR
+from pallas_core.pallas_constants import SKILLS_DIR
 
 
 class SkillManagerTool:

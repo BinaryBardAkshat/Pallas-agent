@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 from dotenv import load_dotenv
-from pallas_constants import PROVIDER_ANTHROPIC
+from pallas_core.pallas_constants import PROVIDER_ANTHROPIC
 
 
 def get_runtime_provider() -> str:

@@ -4,7 +4,7 @@ import time
 from rich.console import Console
 from dotenv import load_dotenv, set_key
 
-from pallas_constants import PROJECT_NAME, VERSION
+from pallas_core.pallas_constants import PROJECT_NAME, VERSION
 from pallas_cli.banner import display_banner
 from pallas_cli.commands import chat_session, show_config
 from pallas_cli.doctor import run_doctor as _run_doctor
@@ -31,12 +31,12 @@ def cli():
 def start(provider, model, no_approval, session):
     with console.status("[bold cyan]Initializing Pallas Core modules...[/bold cyan]", spinner="dots"):
         time.sleep(1.2)  # Simulate module bootstrapping
-        from pallas_constants import (
+        from pallas_core.pallas_constants import (
             PROVIDER_ANTHROPIC, PROVIDER_GOOGLE, PROVIDER_OPENAI,
             PROVIDER_OPENROUTER, PROVIDER_OLLAMA
         )
         import questionary
-        from pallas_state import PallasState
+        from pallas_core.pallas_state import PallasState
         
     display_banner(console)
     state = PallasState()
@@ -154,7 +154,7 @@ def config():
 @click.option("--model", "-m", default=None)
 def ask(message, provider, model):
     from environments.agent_loop import AgentLoop
-    from toolsets import register_all
+    from pallas_core.toolsets import register_all
 
     agent = AgentLoop(provider=provider, model=model, human_in_loop=False)
     register_all(agent, agent.memory)

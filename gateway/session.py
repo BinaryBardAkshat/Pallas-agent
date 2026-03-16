@@ -3,7 +3,7 @@ import uuid
 from typing import Any, Callable, Dict, Optional
 from environments.agent_loop import AgentLoop
 from tools import FileTool, TerminalTool, WebTool, MemoryTool, CodeExecutionTool, SkillManagerTool
-from pallas_constants import PROVIDER_ANTHROPIC
+from pallas_core.pallas_constants import PROVIDER_ANTHROPIC
 
 
 class GatewaySession:

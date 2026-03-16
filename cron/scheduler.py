@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
-from pallas_constants import DATA_DIR
+from pallas_core.pallas_constants import DATA_DIR
 
 CRON_DB = DATA_DIR / "cron.db"
 
