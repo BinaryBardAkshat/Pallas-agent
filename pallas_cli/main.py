@@ -92,16 +92,49 @@ def start(provider, model, no_approval, session):
 
 @cli.command()
 def info():
+    from pallas_core.model_metadata import suggest_model
     display_banner(console)
     console.print("\n[bold cyan]Pallas Agent System v0.1.0[/bold cyan]")
     console.print("Pallas is an elite autonomous AI coding system and research environment.")
+    
+    console.print("\n[bold]LLM Optimized Use Cases:[/bold]")
+    console.print(f" • [green]Coding:[/green]     {suggest_model('coding')} (Ultra Logic)")
+    console.print(f" • [green]Research:[/green]   {suggest_model('research')} (Long Context)")
+    console.print(f" • [green]Heavy:[/green]      {suggest_model('heavy')} (Reasoning Focus)")
+    console.print(f" • [green]Local:[/green]      {suggest_model('local')} (Offline Mode)")
+
     console.print("\n[bold]The 5-Brain Architecture:[/bold]")
-    console.print(" 1. [yellow]Conversation Layer[/yellow] - Terminal, Gateway, and CLI Routing.")
-    console.print(" 2. [yellow]Agent Loop[/yellow] - The Perception-Action-Reflection cycle.")
-    console.print(" 3. [yellow]Tool Sandbox[/yellow] - Executable File, Web, Terminal, and Code runtime tools.")
-    console.print(" 4. [yellow]Learning Memory[/yellow] - FTS5 SQL persistent database remembering past traces.")
-    console.print(" 5. [yellow]Execution Scheduler[/yellow] - Cron routines for active autonomous background tasks.")
-    console.print("\n[dim]Usage: pallas start (login) | pallas doctor (system check) | pallas ask (one-shot)[/dim]\n")
+    console.print(" 1. [yellow]Conversation Layer[/yellow] - Immersive CLI and Multi-Platform Gateways.")
+    console.print(" 2. [yellow]Agent Loop[/yellow] - Sequential Perception-Action-Reflection cycle.")
+    console.print(" 3. [yellow]Tool Sandbox[/yellow] - Native OS control (Terminal, File, Browser).")
+    console.print(" 4. [yellow]Learning Memory[/yellow] - FTS5 SQL persistent history & skill codification.")
+    console.print(" 5. [yellow]Infrastructure Layer[/yellow] - Execution sandboxes (Docker, SSH, Shell).")
+    
+    console.print("\n[dim]Commands: pallas start | pallas ask | pallas doctor | pallas keys[/dim]\n")
+
+
+@cli.command()
+@click.argument("provider_name")
+@click.argument("key_value")
+def keys(provider_name, key_value):
+    """Securely set an API key for a provider."""
+    env_path = os.path.expanduser("~/.pallas/.env")
+    os.makedirs(os.path.dirname(env_path), exist_ok=True)
+    
+    key_map = {
+        "anthropic": "ANTHROPIC_API_KEY",
+        "google": "GOOGLE_API_KEY",
+        "openai": "OPENAI_API_KEY",
+        "openrouter": "OPENROUTER_API_KEY"
+    }
+    
+    var_name = key_map.get(provider_name.lower())
+    if not var_name:
+        console.print(f"[red]Error: Unknown provider '{provider_name}'.[/red]")
+        return
+        
+    set_key(env_path, var_name, key_value)
+    console.print(f"[green]✔ Locked in {var_name} securely in ~/.pallas/.env[/green]")
 
 
 
@@ -132,19 +165,29 @@ def ask(message, provider, model):
 @click.argument("platform")
 def gateway(platform):
     from gateway.session import get_router
-
     router = get_router()
 
     def on_message(chat_id, text, platform_name):
         return router.route(str(chat_id), platform_name, text)
 
+    platform = platform.lower()
     if platform == "telegram":
         from gateway.platforms.telegram import TelegramPlatform
         bot = TelegramPlatform(on_message=on_message)
-        console.print(f"[bold]Starting Telegram gateway...[/bold]")
+        console.print(f"[bold blue]⚡ Initiating Telegram Unified Gateway...[/bold blue]")
+        bot.start()
+    elif platform == "discord":
+        from gateway.platforms.discord import DiscordPlatform
+        bot = DiscordPlatform(on_message=on_message)
+        console.print(f"[bold blue]⚡ Initiating Discord Unified Gateway...[/bold blue]")
+        bot.start()
+    elif platform == "slack":
+        from gateway.platforms.slack import SlackPlatform
+        bot = SlackPlatform(on_message=on_message)
+        console.print(f"[bold blue]⚡ Initiating Slack Unified Gateway...[/bold blue]")
         bot.start()
     else:
-        console.print(f"[red]Unknown platform: {platform}[/red]")
+        console.print(f"[red]Error: Platform '{platform}' is not supported yet.[/red]")
 
 
 def main():

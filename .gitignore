@@ -119,3 +119,7 @@ environments/benchmarks/data/
 # Index cache (auto-generated, not committed)
 skills/index-cache/
 optional-skills/index-cache/
+AI.MD
+FUTURE_FEATURES.MD
+INSTRUCTION.MD
+ROADMAP.MD
