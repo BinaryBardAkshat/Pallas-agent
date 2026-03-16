@@ -48,15 +48,43 @@ class AgentLoop:
         self._tool_registry[name] = fn
 
     def _get_tool_schemas(self) -> List[Dict]:
-        return []
+        return [
+            {
+                "name": "terminal",
+                "description": "Execute bash commands in the local system. You have full access. Use this to take over the terminal and get whatever you need (ls, cat, grep, python, git, etc).",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "command": {"type": "string", "description": "The exact bash command to execute."}
+                    },
+                    "required": ["command"]
+                }
+            },
+            {
+                "name": "file",
+                "description": "Read, write, append, or list files.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "action": {"type": "string", "enum": ["read", "write", "append", "list"]},
+                        "path": {"type": "string", "description": "Absolute or relative path"},
+                        "content": {"type": "string", "description": "Content to write/append (optional)"}
+                    },
+                    "required": ["action", "path"]
+                }
+            }
+        ]
 
     def run(self, user_input: str) -> str:
+        import time
+        from pallas_core.display import console
+        
         self.trajectory.add("user", user_input)
         self.state.save_message(self.session_id, "user", user_input)
 
-        relevant_memories = self.memory.search(user_input, limit=3)
-        if relevant_memories:
-            print_memories(relevant_memories)
+        with console.status("[bold blue]Digging into past memories...[/bold blue]", spinner="dots"):
+            relevant_memories = self.memory.search(user_input, limit=3)
+            time.sleep(0.5)
 
         messages = self.trajectory.to_messages()
         messages = self.compressor.compress(messages, token_budget=100_000)
@@ -65,14 +93,13 @@ class AgentLoop:
         content = ""
 
         for iteration in range(self.MAX_ITERATIONS):
-            print_thinking(f"Step {iteration + 1}...")
-
-            result = self.adapter.completion(
-                messages=messages,
-                system=system,
-                model=self.model,
-                tools=self._get_tool_schemas() or None,
-            )
+            with console.status(f"[bold cyan]Pallas is synthesizing (Step {iteration + 1})...[/bold cyan]", spinner="bouncingBar"):
+                result = self.adapter.completion(
+                    messages=messages,
+                    system=system,
+                    model=self.model,
+                    tools=self._get_tool_schemas() or None,
+                )
 
             if result.get("error") and not result.get("content"):
                 error_msg = f"Provider error: {result['error']}"
