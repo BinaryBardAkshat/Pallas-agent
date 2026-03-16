@@ -32,20 +32,29 @@ def start(provider, model, no_approval, session):
             PROVIDER_OPENROUTER, PROVIDER_OLLAMA
         )
         import questionary
+        from pallas_state import PallasState
         
     display_banner(console)
+    state = PallasState()
+    
+    saved_provider = state.get("default_provider", None)
     
     if not provider:
-        provider = questionary.select(
-            "Select your LLM Provider Operator:",
-            choices=[
-                questionary.Choice("Anthropic (Claude 3.7+ - Recommended)", value=PROVIDER_ANTHROPIC),
-                questionary.Choice("Google (Gemini 2.5 Pro)", value=PROVIDER_GOOGLE),
-                questionary.Choice("OpenAI (GPT-5.4)", value=PROVIDER_OPENAI),
-                questionary.Choice("OpenRouter (Multi-model)", value=PROVIDER_OPENROUTER),
-                questionary.Choice("Ollama (Local/Offline)", value=PROVIDER_OLLAMA),
-            ]
-        ).ask()
+        if saved_provider and saved_provider != "None":
+            provider = saved_provider
+        else:
+            provider = questionary.select(
+                "Select your LLM Provider Operator:",
+                choices=[
+                    questionary.Choice("Anthropic (Claude 3.7+ - Recommended)", value=PROVIDER_ANTHROPIC),
+                    questionary.Choice("Google (Gemini 2.5 Pro)", value=PROVIDER_GOOGLE),
+                    questionary.Choice("OpenAI (GPT-5.4)", value=PROVIDER_OPENAI),
+                    questionary.Choice("OpenRouter (Multi-model)", value=PROVIDER_OPENROUTER),
+                    questionary.Choice("Ollama (Local/Offline)", value=PROVIDER_OLLAMA),
+                ]
+            ).ask()
+            if provider:
+                state.set("default_provider", provider)
         
     if not provider:
         provider = PROVIDER_ANTHROPIC

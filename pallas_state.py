@@ -31,7 +31,7 @@ class PallasState:
             with open(CONFIG_PATH, "r") as f:
                 return json.load(f)
         return {
-            "default_provider": "anthropic",
+            "default_provider": None,
             "active_session": None,
             "skills_enabled": True
         }
