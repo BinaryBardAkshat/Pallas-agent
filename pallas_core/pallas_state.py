@@ -22,6 +22,12 @@ class PallasState:
         conn.execute(
             "CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT, role TEXT, content TEXT, tokens INTEGER, created_at REAL)"
         )
+        # Migration: Ensure tokens column exists
+        try:
+            conn.execute("ALTER TABLE messages ADD COLUMN tokens INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass  # Already exists
+            
         conn.commit()
         conn.close()
 
