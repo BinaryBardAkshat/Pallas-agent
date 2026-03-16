@@ -17,11 +17,11 @@ fi
 
 echo "Installing Pallas Agent globally via uv..."
 
-# Remove previous global installation if exists
+# Uninstall if exists to ensure clean state
 uv tool uninstall pallas 2>/dev/null || true
 
-# Install current directory as a global tool
-uv tool install . --force
+# Install directly from the GitHub repository for global access
+uv tool install git+https://github.com/BinaryBardAkshat/Pallas-agent.git --force
 
 echo ""
 echo "=============================================================================="
