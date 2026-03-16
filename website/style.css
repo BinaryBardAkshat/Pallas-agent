@@ -1,0 +1,238 @@
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: #e2e8f0;
+  background-color: #020617;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --accent: #22d3ee;
+  --accent-glow: rgba(34, 211, 238, 0.4);
+  --bg-gradient: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+  --glass: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  overflow-x: hidden;
+}
+
+.bg-blur {
+  position: fixed;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(34, 211, 238, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 40%);
+  z-index: -1;
+  filter: blur(80px);
+}
+
+h1, h2, h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 10%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #fff, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #94a3b8;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--accent);
+}
+
+.hero {
+  padding: 8rem 10% 4rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  alignment: center;
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 8vw, 6rem);
+  margin: 0;
+  line-height: 1.1;
+  background: linear-gradient(to bottom, #fff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+.cta-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #020617;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px var(--accent-glow);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #fff;
+}
+
+.features {
+  padding: 6rem 10%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.glass-card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 2.5rem;
+  transition: all 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-8px);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.glass-card h3 {
+  margin-top: 0;
+  color: var(--accent);
+  font-size: 1.5rem;
+}
+
+.glass-card p {
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.terminal-preview {
+  margin: 4rem 10%;
+  background: #000;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  font-family: 'Fira Code', monospace;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.terminal-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.red { background: #ff5f56; }
+.yellow { background: #ffbd2e; }
+.green { background: #27c93f; }
+
+.code-line {
+  margin: 0.5rem 0;
+  color: #22d3ee;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 18px;
+  background: var(--accent);
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+footer {
+  padding: 4rem 10%;
+  text-align: center;
+  border-top: 1px solid var(--glass-border);
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 3.5rem; }
+  .navbar { padding: 1rem 5%; }
+  .features { padding: 4rem 5%; }
+}

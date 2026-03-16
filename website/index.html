@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pallas | The Self-Evolving AI OS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="bg-blur"></div>
+      
+      <nav class="navbar">
+        <a href="#" class="logo">PALLAS</a>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#docs">Docs</a>
+          <a href="https://github.com/BinaryBardAkshat/Pallas-agent" class="btn btn-secondary">GitHub</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <h1>Autonomous Intelligence,<br>Refined.</h1>
+        <p>Pallas is a persistent AI operating system that lives where you do. It executes complex workflows, codifies skills, and evolves with every interaction.</p>
+        <div class="cta-group">
+          <a href="#docs" class="btn btn-primary">Get Started</a>
+          <a href="https://github.com/BinaryBardAkshat/Pallas-agent" class="btn btn-secondary">Star on GitHub</a>
+        </div>
+      </section>
+
+      <div class="terminal-preview">
+        <div class="terminal-header">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+        </div>
+        <div class="code-line">binarybardakshat@vinkura:~$ <span id="terminal-text"></span><span class="cursor"></span></div>
+        <div id="terminal-output" style="color: #94a3b8; font-size: 0.875rem; margin-top: 1rem;"></div>
+      </div>
+
+      <section id="features" class="features">
+        <div class="glass-card">
+          <h3>Self-Evolving Skills</h3>
+          <p>Pallas identifies repetitive tasks and autonomously codifies them into portable Python scripts (Skills), building its own library of capabilities.</p>
+        </div>
+        <div class="glass-card">
+          <h3>Local OS Control</h3>
+          <p>Direct terminal access, secure file manipulation, and sandboxed code execution. Pallas is built for power-users who need real work done.</p>
+        </div>
+        <div class="glass-card">
+          <h3>Persistent Memory</h3>
+          <p>Utilizing a hyper-fast SQL backend with Full-Text Search, Pallas remembers context across weeks, not just turns.</p>
+        </div>
+      </section>
+
+      <section id="architecture" style="padding: 4rem 10%; text-align: center;">
+        <h2 style="font-size: 3rem; margin-bottom: 2rem;">The 5-Brain Framework</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+          <div style="padding: 1.5rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);">
+            <h4 style="color: var(--accent);">Conversation</h4>
+            <p style="font-size: 0.875rem; color: #64748b;">Multi-platform gateways.</p>
+          </div>
+          <div style="padding: 1.5rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);">
+            <h4 style="color: var(--accent);">Agent Loop</h4>
+            <p style="font-size: 0.875rem; color: #64748b;">PAR-cycle reasoning.</p>
+          </div>
+          <div style="padding: 1.5rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);">
+            <h4 style="color: var(--accent);">Tool Sandbox</h4>
+            <p style="font-size: 0.875rem; color: #64748b;">Secure execution.</p>
+          </div>
+          <div style="padding: 1.5rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);">
+            <h4 style="color: var(--accent);">Memory Store</h4>
+            <p style="font-size: 0.875rem; color: #64748b;">Persistent traces.</p>
+          </div>
+          <div style="padding: 1.5rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);">
+            <h4 style="color: var(--accent);">Infrastructure</h4>
+            <p style="font-size: 0.875rem; color: #64748b;">Deployment layers.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <p>&copy; 2026 Vinkura AI. Built for the future of agentic computing.</p>
+      </footer>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

@@ -1,64 +1,33 @@
-# Architecture
+# 🏗️ Architecture
 
-## The 5-Brain System
+Pallas is built on a modular, event-driven framework designed for persistence and extreme local flexibility.
 
-Pallas is organized into five functional layers:
+## The 5-Brain Framework
 
 ### 1. Conversation Layer
-Entry point via `pallas_cli`, `gateway`, or `run_agent.py`.
-Routes user input to the agent loop.
+Unified entry points for user communication.
+- **Terminal UI (TUI)**: Rich, interactive CLI experiences using `rich` and `click`.
+- **Multi-Platform Gateway**: Platform-specific adapters (Telegram, Slack, Discord) that map user identities into unique session pools.
 
-### 2. Agent Loop (`environments/agent_loop.py`)
-Core Perception-Action-Reflection cycle.
-- Receives user input
-- Builds prompt from memory + system prompt
-- Calls the LLM provider
-- Parses tool calls
-- Executes tools (with optional human approval)
-- Loops until stop condition
-- Stores result in memory and trajectory
+### 2. Agent Loop
+The core reasoning engine based on the **Perception-Action-Reflection (PAR)** loop.
+- **Perception**: Scans the environment, reads file attachments, and retrieves prior memories using Full-Text Search.
+- **Action**: Uses a deterministic model selector to decide which LLM is best suited for the current tool call (e.g., Claude for Coding, Gemini for Research).
+- **Reflection**: Compares the tool output against the original objective. If the goal isn't met, Pallas adjusts its strategy and loops back.
 
-### 3. Tool Runtime (`tools/`)
-All executable capabilities: file, terminal, web, memory, code, skills.
-Tools are registered into the agent loop by name.
+### 3. Tool Sandbox
+The execution layer for real-world side effects.
+- **Files**: Native I/O with permission guarding.
+- **Terminal**: Real bash execution (sanitized via approval gates).
+- **Code Execution**: Python REPL for mathematical or algorithmic tasks.
+- **Web Research**: Headless extraction and search synthesis.
 
-### 4. Learning System (`pallas_core/memory_store.py`, `skills/`)
-- `MemoryStore`: SQLite FTS5 full-text search over past memories
-- `SOUL`: Key-value personality facts about the user
-- Skills: Markdown playbooks the agent can invoke
+### 4. Memory Store
+Persistence beyond the active context.
+- **SQLite FTS5**: Conversation logs are indexed for instant semantic-like retrieval.
+- **Trajectory Logs**: Structured JSON traces of every decision tree Pallas followed.
 
 ### 5. Infrastructure Layer
-- `pallas_state.py`: Config and session persistence
-- `cron/`: Scheduled jobs
-- `gateway/`: Multi-platform messaging
-- `environments/pallas_base_env.py`: Local shell sandbox
-
-## Data Flow
-
-```
-User Input
-  --> AgentLoop.run()
-    --> PromptBuilder.build_system_prompt()
-    --> MemoryStore.search() [inject relevant context]
-    --> ProviderAdapter.completion()
-      --> Anthropic / Google / OpenAI
-    --> Tool execution (if tool_calls present)
-    --> Trajectory.add()
-    --> MemoryStore.store() [save turn]
-    --> Return final response
-```
-
-## Directory Map
-
-| Path | Purpose |
-|---|---|
-| `pallas_core/` | Brain: LLM adapters, prompt, memory, trajectory |
-| `pallas_cli/` | CLI interface |
-| `environments/` | Agent loop and sandboxes |
-| `tools/` | Callable tools |
-| `gateway/` | Platform messaging adapters |
-| `cron/` | Scheduled job engine |
-| `pallas_state.py` | Config + session DB |
-| `pallas_constants.py` | Single source of truth for paths/models |
-| `skills/` | Markdown procedural memory |
-| `docs/` | Developer documentation |
+The deployment and maintenance substrate.
+- **Cron**: Automated task scheduling.
+- **Sandboxing**: Support for Docker, SSH, and Modal execution environments to keep the host system secure.
