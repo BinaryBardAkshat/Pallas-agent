@@ -1,0 +1,121 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+*.pyd
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# uv
+.uv/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+coverage.xml
+*.xml
+
+# Type checkers
+.mypy_cache/
+.pytype/
+.ruff_cache/
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Runtime data
+*.pid
+*.seed
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Pallas runtime directories
+.pallas/
+~/.pallas/
+
+# Secrets / credentials
+*.pem
+secrets.json
+credentials.json
+service_account.json
+
+# Node (website / docusaurus)
+node_modules/
+.cache/
+.docusaurus/
+website/build/
+
+# Docker artifacts
+.docker/
+*.dockerignore
+
+# OS
+.DS_Store
+ehthumbs.db
+desktop.ini
+
+# Compiled assets
+assets/generated/
+
+# JetBrains
+*.iml
+.idea/
+
+# Byte-compiled
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Modal / Daytona / Singularity
+.modal/
+.daytona/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
+
+# Benchmark results
+environments/benchmarks/results/
+environments/benchmarks/data/
+
+# Index cache (auto-generated, not committed)
+skills/index-cache/
+optional-skills/index-cache/

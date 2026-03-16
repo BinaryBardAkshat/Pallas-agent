@@ -1,14 +1,29 @@
 {
-    "id": "pallas-agent",
-    "name": "Pallas",
+    "name": "pallas-agent",
     "version": "0.1.0",
-    "description": "Self-Evolving AI Agent OS",
-    "author": "VinkuraAI",
+    "description": "Pallas: A self-evolving autonomous AI agent by Vinkura AI.",
+    "author": "Vinkura AI",
     "capabilities": [
-        "file_management",
-        "terminal_access",
-        "web_browsing",
-        "skill_creation",
-        "messaging_gateway"
+        "chat",
+        "tool_use",
+        "memory",
+        "skills",
+        "scheduled_jobs",
+        "multi_platform"
+    ],
+    "providers": [
+        "anthropic",
+        "google",
+        "openai",
+        "openrouter",
+        "ollama"
+    ],
+    "platforms": [
+        "cli",
+        "telegram",
+        "discord",
+        "slack",
+        "whatsapp",
+        "email"
     ]
 }
