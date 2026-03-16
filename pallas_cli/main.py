@@ -1,7 +1,8 @@
 import click
 import os
+import time
 from rich.console import Console
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 
 from pallas_constants import PROJECT_NAME, VERSION
 from pallas_cli.banner import display_banner
@@ -19,14 +20,76 @@ def cli():
 
 
 @cli.command()
-@click.option("--provider", "-p", default="anthropic", help="LLM provider to use.")
+@click.option("--provider", "-p", default=None, help="LLM provider to use.")
 @click.option("--model", "-m", default=None, help="Specific model ID to use.")
 @click.option("--no-approval", is_flag=True, default=False, help="Skip human-in-loop tool approval.")
 @click.option("--session", "-s", default=None, help="Resume a specific session ID.")
 def start(provider, model, no_approval, session):
+    with console.status("[bold cyan]Initializing Pallas Core modules...[/bold cyan]", spinner="dots"):
+        time.sleep(1.2)  # Simulate module bootstrapping
+        from pallas_constants import (
+            PROVIDER_ANTHROPIC, PROVIDER_GOOGLE, PROVIDER_OPENAI,
+            PROVIDER_OPENROUTER, PROVIDER_OLLAMA
+        )
+        import questionary
+        
     display_banner(console)
-    console.print("[bold]Welcome, Operator.[/bold] Type your task. Press Ctrl+C to exit.\n")
+    
+    if not provider:
+        provider = questionary.select(
+            "Select your LLM Provider Operator:",
+            choices=[
+                questionary.Choice("Anthropic (Claude 3.7+ - Recommended)", value=PROVIDER_ANTHROPIC),
+                questionary.Choice("Google (Gemini 2.5 Pro)", value=PROVIDER_GOOGLE),
+                questionary.Choice("OpenAI (GPT-5.4)", value=PROVIDER_OPENAI),
+                questionary.Choice("OpenRouter (Multi-model)", value=PROVIDER_OPENROUTER),
+                questionary.Choice("Ollama (Local/Offline)", value=PROVIDER_OLLAMA),
+            ]
+        ).ask()
+        
+    if not provider:
+        provider = PROVIDER_ANTHROPIC
+
+    env_path = os.path.join(os.getcwd(), ".env")
+    if not os.path.exists(env_path):
+        env_path = os.path.expanduser("~/.pallas/.env")
+        if not os.path.exists(env_path):
+            os.makedirs(os.path.dirname(env_path), exist_ok=True)
+            with open(env_path, "w") as f:
+                f.write("")
+                
+    key_map = {
+        PROVIDER_ANTHROPIC: "ANTHROPIC_API_KEY",
+        PROVIDER_GOOGLE: "GOOGLE_API_KEY",
+        PROVIDER_OPENAI: "OPENAI_API_KEY",
+        PROVIDER_OPENROUTER: "OPENROUTER_API_KEY"
+    }
+
+    env_var = key_map.get(provider)
+    if env_var and not os.getenv(env_var):
+        api_key = questionary.password(f"Please enter your {env_var} (will be saved securely):").ask()
+        if api_key:
+            set_key(env_path, env_var, api_key)
+            os.environ[env_var] = api_key
+            console.print(f"[green]✔ Saved {env_var} securely![/green]")
+
+    console.print("\n[bold]Welcome, Operator.[/bold] Type your task. Press Ctrl+C to exit.\n")
     chat_session(provider=provider, model=model, human_in_loop=not no_approval, session_id=session)
+
+
+@cli.command()
+def info():
+    display_banner(console)
+    console.print("\n[bold cyan]Pallas Agent System v0.1.0[/bold cyan]")
+    console.print("Pallas is an elite autonomous AI coding system and research environment.")
+    console.print("\n[bold]The 5-Brain Architecture:[/bold]")
+    console.print(" 1. [yellow]Conversation Layer[/yellow] - Terminal, Gateway, and CLI Routing.")
+    console.print(" 2. [yellow]Agent Loop[/yellow] - The Perception-Action-Reflection cycle.")
+    console.print(" 3. [yellow]Tool Sandbox[/yellow] - Executable File, Web, Terminal, and Code runtime tools.")
+    console.print(" 4. [yellow]Learning Memory[/yellow] - FTS5 SQL persistent database remembering past traces.")
+    console.print(" 5. [yellow]Execution Scheduler[/yellow] - Cron routines for active autonomous background tasks.")
+    console.print("\n[dim]Usage: pallas start (login) | pallas doctor (system check) | pallas ask (one-shot)[/dim]\n")
+
 
 
 @cli.command()
