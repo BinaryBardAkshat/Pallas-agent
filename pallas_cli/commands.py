@@ -91,7 +91,7 @@ def chat_session(
 
 
 def show_config(console: Console):
-    from pallas_state import PallasState
+    from pallas_core.pallas_state import PallasState
     state = PallasState()
 
     table = Table(title="Pallas Configuration", show_header=True)

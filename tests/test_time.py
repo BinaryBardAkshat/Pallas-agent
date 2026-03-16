@@ -1,5 +1,5 @@
 import pytest
-from pallas_time import utcnow, timestamp, human_elapsed
+from pallas_core.pallas_time import utcnow, timestamp, human_elapsed
 import time
 from datetime import datetime, timezone, timedelta
 

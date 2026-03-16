@@ -37,6 +37,13 @@ class PallasState:
             json.dump(config, f, indent=4)
         self.config = config
 
+    def get(self, key: str, default: Any = None) -> Any:
+        return self.config.get(key, default)
+
+    def set(self, key: str, value: Any):
+        self.config[key] = value
+        self.save_config(self.config)
+
     def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:
         conn = sqlite3.connect(self.db_path)
         cur = conn.cursor()
