@@ -58,11 +58,21 @@ class MemoryStore:
         return rowid
 
     def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
-        rows = self.db.execute(
-            "SELECT m.* FROM memories m JOIN memories_fts f ON m.id = f.rowid WHERE memories_fts MATCH ? ORDER BY rank LIMIT ?",
-            (query, limit)
-        ).fetchall()
-        return [dict(r) for r in rows]
+        import re
+        clean_query = re.sub(r'[^\w\s]', ' ', query).strip()
+        if not clean_query:
+            return []
+
+        fts_query = " OR ".join(f'"{word}"*' for word in clean_query.split())
+        
+        try:
+            rows = self.db.execute(
+                "SELECT m.* FROM memories m JOIN memories_fts f ON m.id = f.rowid WHERE memories_fts MATCH ? ORDER BY rank LIMIT ?",
+                (fts_query, limit)
+            ).fetchall()
+            return [dict(r) for r in rows]
+        except Exception:
+            return []
 
     def get_recent(self, limit: int = 10) -> List[Dict[str, Any]]:
         rows = self.db.execute(

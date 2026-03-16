@@ -1,8 +1,9 @@
 from typing import List, Dict, Any
 
 class PromptBuilder:
-    def __init__(self, soul: str = "Default"):
+    def __init__(self, soul: str = "Default", memory: Any = None):
         self.soul = soul
+        self.memory = memory
 
     def build_system_prompt(self, context: str = "") -> str:
         base_prompt = (
