@@ -1,14 +1,13 @@
 {
-    "id": "pallas-agent",
-    "name": "Pallas",
-    "version": "0.1.0",
-    "description": "Self-Evolving AI Agent OS",
-    "author": "VinkuraAI",
-    "capabilities": [
-        "file_management",
-        "terminal_access",
-        "web_browsing",
-        "skill_creation",
-        "messaging_gateway"
-    ]
+  "name": "Pallas",
+  "version": "0.1.4",
+  "description": "Self-evolving autonomous AI agent operating system",
+  "author": "Vinkura AI",
+  "license": "MIT",
+  "entry_point": "pallas_cli.main:main",
+  "capabilities": ["terminal", "file", "web", "code_execution", "memory", "skills", "vision", "voice"],
+  "providers": ["anthropic", "google", "openai", "openrouter", "ollama"],
+  "platforms": ["cli", "telegram", "discord", "slack"],
+  "min_python": "3.11",
+  "homepage": "https://github.com/vinkura-ai/pallas"
 }

@@ -11,7 +11,7 @@
 
 Mainstream chatbots sit behind restrictive firewalls, throttling your engineering potential. You repeatedly paste code, lose context, hit rigid token limits, and start over. 
 
-**Pallas is the evolutionary successor to Hermes.** 
+
 Pallas acts as your highly localized, autonomous co-pilot built entirely on a **Perception-Action-Reflection (PAR)** loop. It doesn't just answer questions—it drops into a sandbox, spins up a terminal, analyzes your codebase, parses APIs, and executes complex chains of tasks automatically until the job is done. 
 
 It completely persists your identity and project history via a hyper-fast embedded SQL engine with Full-Text Search, recalling design decisions and past architectures across coding sessions. It's your personal Jarvis for elite engineering.

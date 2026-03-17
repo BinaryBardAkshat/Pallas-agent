@@ -1,26 +1,51 @@
-import hashlib
-from typing import Dict, Optional
+from typing import List, Dict, Union
 
+class PromptCacher:
+    """
+    Handles prompt caching annotations for providers that support it (Anthropic, Google).
+    """
+    
+    def wrap_cacheable(self, content: Union[str, List], provider: str) -> Union[str, List, Dict]:
+        """Returns provider-specific cache-annotated content block."""
+        if provider == "anthropic":
+            if isinstance(content, str):
+                return {
+                    "type": "text",
+                    "text": content,
+                    "cache_control": {"type": "ephemeral"}
+                }
+            return content # Already a list or dict, complex to wrap here
+        
+        return content
 
-class PromptCache:
-    def __init__(self, max_entries: int = 100):
-        self._cache: Dict[str, str] = {}
-        self._max_entries = max_entries
+    def apply_to_messages(self, messages: List[Dict], provider: str) -> List[Dict]:
+        """Annotates system prompt and early turns for caching."""
+        if provider not in ["anthropic", "google"]:
+            return messages
 
-    def _hash(self, text: str) -> str:
-        return hashlib.sha256(text.encode()).hexdigest()[:16]
+        new_messages = []
+        for i, msg in enumerate(messages):
+            # Cache the system prompt and the first few messages if they are stable
+            if i < 3: # Cache first 3 turns
+                content = msg.get("content", "")
+                if isinstance(content, str) and provider == "anthropic":
+                    new_messages.append({
+                        "role": msg["role"],
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": content,
+                                "cache_control": {"type": "ephemeral"}
+                            }
+                        ]
+                    })
+                else:
+                    new_messages.append(msg)
+            else:
+                new_messages.append(msg)
+        
+        return new_messages
 
-    def get(self, prompt: str) -> Optional[str]:
-        return self._cache.get(self._hash(prompt))
-
-    def put(self, prompt: str, response: str):
-        if len(self._cache) >= self._max_entries:
-            oldest = next(iter(self._cache))
-            del self._cache[oldest]
-        self._cache[self._hash(prompt)] = response
-
-    def clear(self):
-        self._cache.clear()
-
-    def size(self) -> int:
-        return len(self._cache)
+# Google Gemini: Cache is handled differently via CachedContent API in SDK,
+# usually requiring a separate 'create_cache' call. 
+# This implementation focuses on Anthropic's inline ephemeral caching.

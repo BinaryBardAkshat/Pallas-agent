@@ -13,7 +13,7 @@ BANNER_TEXT = """
 
 SUBTITLE = "Pallas Agent — Built to evolve with you."
 VINKURA_BRAND = "VINKURA AI"
-STATUS_LINE = "● System: Ready | Mode: Autonomous | Wisdom: Online"
+STATUS_LINE = "● System: Ready | Mode: Autonomous"
 
 def display_banner(console: Console):
     banner = Align.center(f"[bold blue]{BANNER_TEXT}[/bold blue]", vertical="middle")

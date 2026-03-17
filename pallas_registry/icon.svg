@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background radial gradient: deep navy to dark purple -->
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#1e1e40"/>
+      <stop offset="100%" stop-color="#0d0d1a"/>
+    </radialGradient>
+
+    <!-- Owl body gradient: dark navy with slight purple tint -->
+    <linearGradient id="body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#2a2a5e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+
+    <!-- Wing gradient -->
+    <linearGradient id="wing-left" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#1a1a4a"/>
+      <stop offset="100%" stop-color="#0e0e2e"/>
+    </linearGradient>
+    <linearGradient id="wing-right" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#1a1a4a"/>
+      <stop offset="100%" stop-color="#0e0e2e"/>
+    </linearGradient>
+
+    <!-- Eye glow -->
+    <radialGradient id="eye-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="35%"  stop-color="#00d4ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#0077aa" stop-opacity="0.6"/>
+    </radialGradient>
+
+    <!-- Eye pupil -->
+    <radialGradient id="pupil" cx="40%" cy="35%" r="60%">
+      <stop offset="0%"   stop-color="#002233"/>
+      <stop offset="100%" stop-color="#000a10"/>
+    </radialGradient>
+
+    <!-- Crown / star accent glow -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Subtle outer glow on the whole owl -->
+    <filter id="body-glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ── Circle background ───────────────────────────────────────────────── -->
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+
+  <!-- Subtle inner ring border -->
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.18"/>
+
+  <!-- ── Left wing ──────────────────────────────────────────────────────── -->
+  <path d="M256,310 C220,295 148,320 112,380 C148,345 175,330 256,340 Z"
+        fill="url(#wing-left)" stroke="#00d4ff" stroke-width="1" opacity="0.85"/>
+
+  <!-- ── Right wing ─────────────────────────────────────────────────────── -->
+  <path d="M256,310 C292,295 364,320 400,380 C364,345 337,330 256,340 Z"
+        fill="url(#wing-right)" stroke="#00d4ff" stroke-width="1" opacity="0.85"/>
+
+  <!-- ── Owl body (rounded teardrop) ────────────────────────────────────── -->
+  <ellipse cx="256" cy="320" rx="88" ry="110" fill="url(#body)" filter="url(#body-glow)"/>
+
+  <!-- Body feather texture lines -->
+  <path d="M220,285 Q256,275 292,285" fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.25"/>
+  <path d="M214,305 Q256,292 298,305" fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.20"/>
+  <path d="M210,325 Q256,310 302,325" fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.18"/>
+  <path d="M212,345 Q256,330 300,345" fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.15"/>
+  <path d="M218,365 Q256,350 294,365" fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.12"/>
+
+  <!-- ── Owl head (circle) ───────────────────────────────────────────────── -->
+  <circle cx="256" cy="220" r="90" fill="url(#body)" filter="url(#body-glow)"/>
+
+  <!-- Head feather detail arcs -->
+  <path d="M200,215 Q256,200 312,215" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.20"/>
+  <path d="M204,235 Q256,218 308,235" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.18"/>
+
+  <!-- ── Ear tufts ───────────────────────────────────────────────────────── -->
+  <!-- Left ear tuft -->
+  <polygon points="212,140 200,110 228,130" fill="#1a2050" stroke="#00d4ff" stroke-width="1.5" opacity="0.9"/>
+  <polygon points="218,138 208,112 232,128" fill="#2a2a6e" opacity="0.6"/>
+
+  <!-- Right ear tuft -->
+  <polygon points="300,140 312,110 284,130" fill="#1a2050" stroke="#00d4ff" stroke-width="1.5" opacity="0.9"/>
+  <polygon points="294,138 304,112 280,128" fill="#2a2a6e" opacity="0.6"/>
+
+  <!-- ── Left eye ────────────────────────────────────────────────────────── -->
+  <!-- Outer ring (gold accent) -->
+  <circle cx="220" cy="215" r="34" fill="#ffd700" opacity="0.25"/>
+  <!-- Eye white/iris -->
+  <circle cx="220" cy="215" r="30" fill="url(#eye-glow)"/>
+  <!-- Pupil -->
+  <circle cx="220" cy="215" r="16" fill="url(#pupil)"/>
+  <!-- Catchlight -->
+  <circle cx="213" cy="208" r="5" fill="#ffffff" opacity="0.75"/>
+  <!-- Outer eye ring -->
+  <circle cx="220" cy="215" r="30" fill="none" stroke="#00d4ff" stroke-width="2.5" opacity="0.7"/>
+
+  <!-- ── Right eye ───────────────────────────────────────────────────────── -->
+  <!-- Outer ring (gold accent) -->
+  <circle cx="292" cy="215" r="34" fill="#ffd700" opacity="0.25"/>
+  <!-- Eye white/iris -->
+  <circle cx="292" cy="215" r="30" fill="url(#eye-glow)"/>
+  <!-- Pupil -->
+  <circle cx="292" cy="215" r="16" fill="url(#pupil)"/>
+  <!-- Catchlight -->
+  <circle cx="285" cy="208" r="5" fill="#ffffff" opacity="0.75"/>
+  <!-- Outer eye ring -->
+  <circle cx="292" cy="215" r="30" fill="none" stroke="#00d4ff" stroke-width="2.5" opacity="0.7"/>
+
+  <!-- ── Beak ────────────────────────────────────────────────────────────── -->
+  <polygon points="256,245 238,268 274,268"
+           fill="#ffd700" opacity="0.92" stroke="#c8a800" stroke-width="1"/>
+  <!-- Beak ridge -->
+  <line x1="256" y1="245" x2="256" y2="268" stroke="#c8a800" stroke-width="1" opacity="0.5"/>
+
+  <!-- ── Talons / feet ───────────────────────────────────────────────────── -->
+  <!-- Left foot -->
+  <path d="M220,420 L210,440 M220,420 L220,442 M220,420 L230,440"
+        stroke="#ffd700" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+  <!-- Right foot -->
+  <path d="M292,420 L282,440 M292,420 L292,442 M292,420 L302,440"
+        stroke="#ffd700" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- ── Crown: 5-point star above the head ─────────────────────────────── -->
+  <g filter="url(#glow)" opacity="0.92">
+    <polygon
+      points="256,102 261,120 280,120 266,131 271,149 256,139 241,149 246,131 232,120 251,120"
+      fill="#ffd700" stroke="#ffaa00" stroke-width="1.5"/>
+  </g>
+
+  <!-- ── Subtle cyan body outline to crisp the silhouette ──────────────── -->
+  <ellipse cx="256" cy="320" rx="88" ry="110"
+           fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.30"/>
+  <circle  cx="256" cy="220" r="90"
+           fill="none" stroke="#00d4ff" stroke-width="1.2" opacity="0.30"/>
+
+  <!-- ── Bottom brand text ──────────────────────────────────────────────── -->
+  <text x="256" y="488"
+        font-family="'Segoe UI', Arial, sans-serif"
+        font-size="22"
+        font-weight="600"
+        letter-spacing="6"
+        fill="#00d4ff"
+        opacity="0.65"
+        text-anchor="middle">PALLAS</text>
+</svg>

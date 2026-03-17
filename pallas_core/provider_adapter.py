@@ -130,7 +130,7 @@ class ProviderAdapter:
         if self.provider == PROVIDER_ANTHROPIC:
             return self._anthropic_completion(messages, system, resolved_model, max_tokens, tools)
         elif self.provider == PROVIDER_GOOGLE:
-            return self._google_completion(messages, system, resolved_model, max_tokens)
+            return self._google_completion(messages, system, resolved_model, max_tokens, tools)
         elif self.provider == PROVIDER_OPENAI:
             return self._openai_completion(messages, system, resolved_model, max_tokens)
         elif self.provider == PROVIDER_OPENROUTER:
@@ -266,46 +266,68 @@ class ProviderAdapter:
             if content_parts:
                 gemini_messages.append(types.Content(role=role, parts=content_parts))
                 
-        try:
-            config_kwargs = {
-                "max_output_tokens": max_tokens,
-            }
-            if gemini_tools:
-                config_kwargs["tools"] = gemini_tools
-            if system:
-                config_kwargs["system_instruction"] = system
-                
-            resp = client.models.generate_content(
-                model=model,
-                contents=gemini_messages,
-                config=types.GenerateContentConfig(**config_kwargs)
-            )
+        # Model fallback chain: if primary model is overloaded, try these in order
+        _GOOGLE_FALLBACK_MODELS = [
+            model,
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+        ]
+        # Deduplicate preserving order
+        seen: set = set()
+        fallback_chain = [m for m in _GOOGLE_FALLBACK_MODELS if not (m in seen or seen.add(m))]
 
-            tool_calls = []
-            content = ""
-            stop_reason = "end_turn"
-            
-            if resp.candidates and resp.candidates[0].content and resp.candidates[0].content.parts:
-                for part in resp.candidates[0].content.parts:
-                    if part.function_call:
-                        args_dict = {k: v for k, v in part.function_call.args.items()} if part.function_call.args else {}
-                        tool_calls.append({
-                            "name": part.function_call.name,
-                            "input": args_dict,
-                            "id": f"call_{uuid.uuid4().hex[:8]}"
-                        })
-                        stop_reason = "tool_use"
-                    elif part.text:
-                        content += part.text
+        last_error = ""
+        for attempt_model in fallback_chain:
+            try:
+                config_kwargs = {
+                    "max_output_tokens": max_tokens,
+                }
+                if gemini_tools:
+                    config_kwargs["tools"] = gemini_tools
+                if system:
+                    config_kwargs["system_instruction"] = system
 
-            return ProviderResponse(
-                content=content,
-                tool_calls=tool_calls,
-                tokens=0,
-                stop_reason=stop_reason,
-            ).to_dict()
-        except Exception as e:
-            return ProviderResponse(content="", error=f"Gemini API Error: {str(e)}").to_dict()
+                resp = client.models.generate_content(
+                    model=attempt_model,
+                    contents=gemini_messages,
+                    config=types.GenerateContentConfig(**config_kwargs)
+                )
+
+                tool_calls = []
+                content = ""
+                stop_reason = "end_turn"
+
+                if resp.candidates and resp.candidates[0].content and resp.candidates[0].content.parts:
+                    for part in resp.candidates[0].content.parts:
+                        if part.function_call:
+                            args_dict = {k: v for k, v in part.function_call.args.items()} if part.function_call.args else {}
+                            tool_calls.append({
+                                "name": part.function_call.name,
+                                "input": args_dict,
+                                "id": f"call_{uuid.uuid4().hex[:8]}"
+                            })
+                            stop_reason = "tool_use"
+                        elif part.text:
+                            content += part.text
+
+                return ProviderResponse(
+                    content=content,
+                    tool_calls=tool_calls,
+                    tokens=0,
+                    stop_reason=stop_reason,
+                ).to_dict()
+
+            except Exception as e:
+                last_error = str(e)
+                # Only retry on capacity/availability errors
+                if any(code in last_error for code in ("503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED")):
+                    continue
+                # Non-retriable error — return immediately
+                return ProviderResponse(content="", error=f"Gemini API Error: {last_error}").to_dict()
+
+        return ProviderResponse(content="", error=f"Gemini API Error (all models tried): {last_error}").to_dict()
 
     def _openai_completion(
         self, messages, system, model, max_tokens, tools=None
@@ -396,7 +418,7 @@ class ProviderAdapter:
         try:
             resp = client.chat.completions.create(
                 model=model,
-                messages=[{"role": "user", "content": combined_input}],
+                messages=all_messages,
                 max_tokens=max_tokens,
             )
             return ProviderResponse(
